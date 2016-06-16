@@ -116,18 +116,26 @@ class WriteSession(DatagramProtocol):
 
         """
         bytes = ACKDatagram(datagram.blocknum).to_wire()
-        self.timeout_watchdog = SequentialCall.run(self.timeout[:-1],
-            callable=self.sendData, callable_args=[bytes, ],
-            on_timeout=lambda: self._clock.callLater(self.timeout[-1], self.timedOut),
-            run_now=True,
-            _clock=self._clock
-        )
         if len(datagram.data) < self.block_size:
+            self._clock.callLater(0, self.sendData, bytes)
+            self.timeout_watchdog = SequentialCall.run(self.timeout[:-1],
+                callable=lambda: None,
+                on_timeout=lambda: self._clock.callLater(self.timeout[-1], self.timedOut),
+                run_now=False,
+                _clock=self._clock
+            )
             self.completed = True
             self.writer.finish()
             # TODO: If self.tsize is not None, compare it with the actual
             # count of bytes written. Log if there's a mismatch. Should it
             # also emit an error datagram?
+        else:
+            self.timeout_watchdog = SequentialCall.run(self.timeout[:-1],
+                callable=self.sendData, callable_args=[bytes, ],
+                on_timeout=lambda: self._clock.callLater(self.timeout[-1], self.timedOut),
+                run_now=True,
+                _clock=self._clock
+            )
 
     def blockWriteFailure(self, failure):
         """Write failed"""
