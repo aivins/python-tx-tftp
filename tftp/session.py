@@ -186,7 +186,7 @@ class ReadSession(DatagramProtocol):
 
     """
     block_size = 512
-    timeout = (1, 3, 7)
+    timeout = (3, 9, 21)
 
     def __init__(self, reader, _clock=None):
         self.reader = reader
