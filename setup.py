@@ -16,7 +16,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development :: Libraries',
     ],
-    packages={'tftp'},
-    install_requires={"Twisted"},
+    packages=['tftp'],
+    install_requires=["Twisted"],
     description="A Twisted-based TFTP implementation.",
 )
