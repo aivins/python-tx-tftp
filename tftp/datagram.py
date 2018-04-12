@@ -131,8 +131,11 @@ class RQDatagram(TFTPDatagram):
             filename, mode = parts.pop(0), parts.pop(0)
         except IndexError:
             raise PayloadDecodeError("Not enough fields in the payload")
-        if parts and not parts[-1]:
+
+        # Work around Cisco 7941 sending empty options at end of payload
+        while parts and not parts[-1]:
             parts.pop(-1)
+
         options = OrderedDict()
         # To maintain consistency during testing.
         # The actual order of options is not important as per RFC2347
